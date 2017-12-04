@@ -1,19 +1,14 @@
-#
-# project: cr
-#
-
+project(cr)
+cmake_minimum_required(VERSION 3.0.2)
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-SET(FIPS_DYNAMIC_CRT 1)
 
-cmake_minimum_required(VERSION 3.0)
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-get_filename_component(FIPS_ROOT_DIR "../fips" ABSOLUTE)
-include("${FIPS_ROOT_DIR}/cmake/fips.cmake")
+include(conanbuildinfo.cmake)
+conan_basic_setup()
 
-if (NOT FIPS_IMPORT)
-    fips_setup(PROJECT cr)
-        add_definitions(-DCR_DEPLOY_PATH="${FIPS_PROJECT_DEPLOY_DIR}")
-        fips_add_subdirectory(samples)
-        fips_add_subdirectory(tests)
-    fips_finish()
-endif()
+enable_testing()
+
+add_definitions("-std=c++1z")
+add_definitions(-DCR_DEPLOY_PATH="${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+
+add_subdirectory(samples)
+add_subdirectory(tests)

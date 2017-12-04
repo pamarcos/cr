@@ -80,14 +80,16 @@ The second one demonstrates how to live-reload an opengl application using
 
 #### Running Samples and Tests
 
-The samples and tests uses the [fips build system](https://github.com/floooh/fips). It requires Python and CMake.
+The samples and tests uses [conan](https://www.conan.io). If you already have Python installed but not conan, you just need to run `pip install conan`. 
+Tests also require CMake in order to build.
 
 ```
-$ ./fips build            # will generate and build all artifacts
-$ ./fips run crTest       # To run tests
-$ ./fips run imgui_host   # To run imgui sample
+$ conan install -b                      # To download and build dependencies (glfw, imgui)
+$ cmake -Bbuild -H.                     # To configure tests
+$ cmake --build build                   # To compile
+$ build/bin/imgui_host                  # To run imgui sample
 # open a new console, then modify imgui_guest.cpp
-$ ./fips make imgui_guest # to build and force imgui sample live reload
+$ cmake --build -target imgui_guest     # to build and force imgui sample live reload
 ```
 
 ### Documentation

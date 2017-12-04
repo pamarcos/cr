@@ -1,15 +1,12 @@
-fips_begin_sharedlib(test_basic cmdline)
-    fips_files(test_basic.cpp test_data.h test_basic.x)
-fips_end_sharedlib()
+add_library(test_basic SHARED test_basic.cpp test_data.h test_basic.x)
+add_executable(crTest test.cpp test_data.h test_basic.x)
 
-gtest_begin(cr)
-    fips_files(test.cpp test_data.h test_basic.x)
-    if (FIPS_LINUX OR FIPS_MACOS)
-        fips_libs(dl stdc++fs)
-    endif()
-gtest_end()
+link_directories(${CONAN_LIB_DIRS_GTEST})
+target_link_libraries(crTest ${CONAN_LIBS_GTEST})
 
-if (FIPS_LINUX OR FIPS_MACOS)
-    # no-stack-protector as this interfere with our crash handling test
-    set_target_properties(crTest PROPERTIES COMPILE_FLAGS "-std=c++17 -fno-stack-protector")
+if (UNIX)
+    target_link_libraries(crTest dl stdc++fs)
+    set_target_properties(crTest PROPERTIES COMPILE_FLAGS "-fno-stack-protector")
 endif()
+
+add_test(crTest ${CMAKE_BINARY_DIR}/bin/crTest)

@@ -1,0 +1,7 @@
+[requires]
+gtest/1.8.0@lasote/stable
+glfw/latest@thoughton/testing
+ImGui/latest@thoughton/testing
+
+[generators]
+cmake

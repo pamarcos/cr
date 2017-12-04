@@ -1,68 +1,33 @@
-fips_begin_sharedlib(basic_guest cmdline)
-    fips_files(basic_guest.c)
-fips_end_sharedlib()
+add_library(basic_guest SHARED basic_guest.c)
+add_executable(basic_host basic_host.cpp)
 
-fips_begin_app(basic_host cmdline)
-    fips_files(basic_host.cpp)
-    if (FIPS_LINUX OR FIPS_MACOS)
-        fips_libs(dl stdc++fs)
-    endif()
-fips_end_app()
+add_library(basic_guest_b SHARED basic_guest_b.c)
+add_executable(basic_host_b basic_host_b.cpp)
 
-fips_begin_sharedlib(basic_guest_b cmdline)
-    fips_files(basic_guest_b.c)
-fips_end_sharedlib()
+file(GLOB GL_SRC
+    "GL/*.h"
+    "GL/*.cpp"
+)
 
-fips_begin_app(basic_host_b cmdline)
-    fips_files(basic_host_b.cpp)
-    if (FIPS_LINUX OR FIPS_MACOS)
-        fips_libs(dl stdc++fs)
-    endif()
-fips_end_app()
+add_library(imgui_guest SHARED imgui_guest.cpp ${GL_SRC})
+include_directories(.)
+link_directories(${CONAN_LIB_DIRS_GLFW} ${CONAN_LIB_DIRS_IMGUI})
+target_link_libraries(imgui_guest ${CONAN_LIBS_GLFW})
 
-fips_begin_sharedlib(imgui_guest cmdline)
-    fips_files(imgui_guest.cpp)
-    fips_src(GL GROUP_FOLDERS)
-    include_directories(.)
+add_executable(imgui_host imgui_host.cpp ${GL_SRC})
+target_link_libraries(imgui_host ${CONAN_LIBS_GLFW} ${CONAN_LIBS_IMGUI})
 
-    fips_deps(imgui glfw3)
+if (UNIX)
+    target_link_libraries(basic_guest dl stdc++fs)
+    target_link_libraries(basic_host dl stdc++fs)
+    target_link_libraries(basic_guest_b dl stdc++fs)
+    target_link_libraries(basic_host_b dl stdc++fs)
 
-    if (FIPS_WINDOWS)
-        fips_libs(opengl32)
-    endif()
+    target_link_libraries(imgui_guest dl stdc++fs)
+    target_link_libraries(imgui_host dl stdc++fs)
+endif()
 
-    if (FIPS_LINUX)
-        fips_libs(X11 Xrandr Xi Xinerama Xxf86vm Xcursor GL m dl)
-    endif()
-
-    if (FIPS_MACOS)
-        fips_frameworks_osx(Cocoa CoreVideo OpenGL)
-        fips_libs(m dl)
-    endif()
-fips_end_sharedlib()
-
-fips_begin_app(imgui_host cmdline)
-    fips_files(imgui_host.cpp)
-    fips_src(GL GROUP_FOLDERS)
-    include_directories(.)
-    fips_deps(imgui glfw3)
-
-    if (FIPS_WINDOWS)
-        fips_libs(opengl32)
-    endif()
-
-    if (FIPS_LINUX)
-        fips_libs(X11 Xrandr Xi Xinerama Xxf86vm Xcursor GL m dl stdc++fs)
-    endif()
-
-    if (FIPS_MACOS)
-        fips_frameworks_osx(Cocoa CoreVideo OpenGL)
-        fips_libs(m dl stdc++fs)
-    endif()
-fips_end_app()
-
-
-if (FIPS_MSVC)
+if (MSVC)
     # vs2017 filesystem support
     set_target_properties(basic_guest PROPERTIES COMPILE_FLAGS "/std:c++latest")
     set_target_properties(basic_host  PROPERTIES COMPILE_FLAGS "/std:c++latest")
