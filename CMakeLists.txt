@@ -7,8 +7,16 @@ conan_basic_setup()
 
 enable_testing()
 
+option(BUILD_TESTS "BUILD_TESTS" ON)
+option(BUILD_SAMPLES "BUILD_SAMPLES" ON)
+
 add_definitions("-std=c++1z")
 add_definitions(-DCR_DEPLOY_PATH="${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 
-add_subdirectory(samples)
-add_subdirectory(tests)
+if (BUILD_TESTS)
+    add_subdirectory(tests)
+endif()
+
+if (BUILD_SAMPLES)
+    add_subdirectory(samples)
+endif()
