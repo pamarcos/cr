@@ -15,7 +15,7 @@ A single file header-only live reload solution for C, written in C++:
 
 |Platform|Build Status|
 |--------|------|
-|Linux|[![Build Status](https://travis-ci.org/fungos/cr.svg?branch=master)](https://travis-ci.org/fungos/cr)|
+|Linux|[![Build Status](https://travis-ci.org/pamarcos/cr.svg?branch=conan)](https://travis-ci.org/pamarcos/cr)|
 |Windows|[![Build status](https://ci.appveyor.com/api/projects/status/jf0dq97w9b7b5ihi?svg=true)](https://ci.appveyor.com/project/fungos/cr)|
 
 Note that the only file that matters is `cr.h`.
