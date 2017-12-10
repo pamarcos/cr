@@ -347,14 +347,13 @@ struct cr_plugin {
 #ifndef CR_HOST
 
 // Some helpers required in the guest side.
-#pragma section(".state", read, write)
-
 #if defined(_MSC_VER)
-// GCC: __attribute__((section(".state")))
+#pragma section(".state", read, write)
 #define CR_STATE __declspec(allocate(".state"))
-#endif // defined(_MSC_VER)
-
-#if defined(__GNUC__) // clang & gcc
+#elif defined(__APPLE__)
+#define CR_STATE __attribute__((used,section("__DATA,__state")))
+#elif defined(__GNUC__) // clang & gcc
+#pragma section(".state", read, write)
 #define CR_STATE __attribute__((section(".state")))
 #endif // defined(__GNUC__)
 
@@ -839,9 +838,7 @@ static int cr_plugin_main(cr_plugin &ctx, cr_op operation) {
 #include <csignal>
 #include <cstring>
 #include <dlfcn.h>
-#include <elf.h>
 #include <fcntl.h>
-#include <link.h>
 #include <setjmp.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -866,6 +863,10 @@ bool cr_is_empty(const void *const buf, int64_t len) {
     }
     return !r;
 }
+
+#if !defined(__APPLE__)
+#include <elf.h>
+#include <link.h>
 
 // unix,internal
 // save section informations to be used during load/unload when copying
@@ -1043,6 +1044,14 @@ static bool cr_plugin_validate_sections(cr_plugin &ctx, so_handle handle,
 
     return result;
 }
+#else // __APPLE__
+
+static bool cr_plugin_validate_sections(cr_plugin &ctx, so_handle handle,
+                                        const fs::path &imagefile,
+                                        bool rollback) {
+}
+
+#endif
 
 static void cr_so_unload(cr_plugin &ctx) {
     assert(ctx.p);
