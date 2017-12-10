@@ -20,3 +20,9 @@ endif()
 if (BUILD_SAMPLES)
     add_subdirectory(samples)
 endif()
+
+# Ensure /MT is used in MSVC
+if (MSVC)
+    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
+    string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE ${CMAKE_CXX_FLAGS_RELEASE})
+endif()
