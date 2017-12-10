@@ -268,6 +268,15 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #ifndef __CR_H__
 #define __CR_H__
 
+// Define own macros for platform compatibility
+#if defined(_WIN32)
+#define CR_PLATFORM_WIN
+#elif defined(__linux__)
+#define CR_PLATFORM_LINUX
+#elif defined(__APPLE__)
+#define CR_PLATFORM_MAC
+#endif
+
 // cr_mode defines how much we validate global state transfer between
 // instances. The default is CR_UNSAFE, you can choose another mode by
 // defining CR_HOST, ie.: #define CR_HOST CR_SAFEST
@@ -425,7 +434,7 @@ static bool cr_plugin_changed(cr_plugin &ctx);
 static bool cr_plugin_rollback(cr_plugin &ctx);
 static int cr_plugin_main(cr_plugin &ctx, cr_op operation);
 
-#if defined(_WIN32)
+#ifdef CR_PLATFORM_WIN
 
 // clang-format off
 #include <windows.h>
@@ -831,9 +840,9 @@ static int cr_plugin_main(cr_plugin &ctx, cr_op operation) {
     return 0;
 }
 
-#endif // _WIN32
+#endif // CR_PLATFORM_WIN
 
-#if defined(__unix__)
+#if defined(CR_PLATFORM_LINUX) || defined(CR_PLATFORM_MAC)
 
 #include <csignal>
 #include <cstring>
@@ -864,7 +873,7 @@ bool cr_is_empty(const void *const buf, int64_t len) {
     return !r;
 }
 
-#if !defined(__APPLE__)
+#if defined(CR_PLATFORM_LINUX)
 #include <elf.h>
 #include <link.h>
 
@@ -1044,7 +1053,7 @@ static bool cr_plugin_validate_sections(cr_plugin &ctx, so_handle handle,
 
     return result;
 }
-#else // __APPLE__
+#elif defined(CR_PLATFORM_MAC)
 
 static bool cr_plugin_validate_sections(cr_plugin &ctx, so_handle handle,
                                         const fs::path &imagefile,
@@ -1150,7 +1159,7 @@ static int cr_plugin_main(cr_plugin &ctx, cr_op operation) {
 
     return 0;
 }
-#endif // __unix__
+#endif // CR_PLATFORM_LINUX or CR_PLATFORM_MAC
 
 static bool cr_plugin_load_internal(cr_plugin &ctx, bool rollback) {
     auto p = (cr_internal *)ctx.p;
