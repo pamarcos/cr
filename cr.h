@@ -271,10 +271,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // Define own macros for platform compatibility
 #if defined(_WIN32)
 #define CR_PLATFORM_WIN
+#define CR_LIB_EXT "dll"
 #elif defined(__linux__)
 #define CR_PLATFORM_LINUX
+#define CR_LIB_EXT "so"
 #elif defined(__APPLE__)
 #define CR_PLATFORM_MAC
+#define CR_LIB_EXT "dylib"
 #endif
 
 // cr_mode defines how much we validate global state transfer between
@@ -359,9 +362,9 @@ struct cr_plugin {
 #if defined(_MSC_VER)
 #pragma section(".state", read, write)
 #define CR_STATE __declspec(allocate(".state"))
-#elif defined(__APPLE__)
+#elif defined(CR_PLATFORM_MAC)
 #define CR_STATE __attribute__((used,section("__DATA,__state")))
-#elif defined(__GNUC__) // clang & gcc
+#elif defined(CR_PLATFORM_LINUX) // clang & gcc
 #pragma section(".state", read, write)
 #define CR_STATE __attribute__((section(".state")))
 #endif // defined(__GNUC__)
@@ -1058,6 +1061,7 @@ static bool cr_plugin_validate_sections(cr_plugin &ctx, so_handle handle,
 static bool cr_plugin_validate_sections(cr_plugin &ctx, so_handle handle,
                                         const fs::path &imagefile,
                                         bool rollback) {
+    return true;
 }
 
 #endif
@@ -1112,7 +1116,9 @@ static void cr_plat_init() {
     sa.sa_flags = SA_SIGINFO | SA_RESTART | SA_NODEFER;
     sigemptyset(&sa.sa_mask);
     sa.sa_sigaction = cr_signal_handler;
+#ifdef CR_PLATFORM_LINUX
     sa.sa_restorer = nullptr;
+#endif
 
     if (sigaction(SIGILL, &sa, nullptr) == -1) {
         fprintf(stderr, "Failed to setup SIGILL handler\n");

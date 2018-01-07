@@ -14,11 +14,7 @@ void touch(const char *filename) {
 }
 
 TEST(crTest, basic_flow) {
-#if _WIN32
-    const char *bin = CR_DEPLOY_PATH "/test_basic.dll";
-#else
-    const char *bin = CR_DEPLOY_PATH "/libtest_basic.so";
-#endif
+    const char *bin = CR_DEPLOY_PATH "/test_basic." CR_LIB_EXT;
 
     using namespace test_basic;
     cr_plugin ctx;

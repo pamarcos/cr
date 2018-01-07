@@ -4,8 +4,8 @@ add_executable(crTest test.cpp test_data.h test_basic.x)
 link_directories(${CONAN_LIB_DIRS_GTEST})
 target_link_libraries(crTest ${CONAN_LIBS_GTEST})
 
-if (UNIX)
-    target_link_libraries(crTest dl stdc++fs)
+if(UNIX)
+    target_link_libraries(crTest dl ${CXX_FILESYSTEM})
     set_target_properties(crTest PROPERTIES COMPILE_FLAGS "-fno-stack-protector")
 endif()
 

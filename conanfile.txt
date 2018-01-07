@@ -5,3 +5,6 @@ ImGui/latest@thoughton/testing
 
 [generators]
 cmake
+
+[options]
+gtest:shared=False

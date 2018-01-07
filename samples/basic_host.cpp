@@ -5,11 +5,7 @@
 #define CR_HOST CR_UNSAFE // try to best manage static states
 #include "../cr.h"
 
-#if _WIN32
-const char *plugin = CR_DEPLOY_PATH "/basic_guest.dll";
-#else
-const char *plugin = CR_DEPLOY_PATH "/libbasic_guest.so";
-#endif
+const char *plugin = CR_DEPLOY_PATH "/basic_guest." CR_LIB_EXT;
 
 int main(int argc, char *argv[]) {
     cr_plugin ctx;
